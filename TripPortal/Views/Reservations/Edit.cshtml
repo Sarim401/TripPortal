@@ -1,0 +1,37 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model TripPortal.Models.Entities.Reservation
+
+<h1>Edit Reservation</h1>
+<form method="post">
+
+
+    <div class="mt-3">
+        <label class="form-label">ReservationID</label>
+        <input type="text" class="form-control" asp-for="ReservationID" readonly/>
+    </div>
+    <div class="mt-3">
+        <label class="form-label">StudentID</label>
+        <input type="text" class="form-control" asp-for="StudentID" readonly />
+    </div>
+    <div class="mt-3">
+        <label class="form-label">TripID</label>
+        <input type="text" class="form-control" asp-for="TripID" readonly />
+    </div>
+    <div class="mt-3">
+        <label class="form-label">ReservationDate</label>
+        <input type="date" class="form-control" asp-for="ReservationDate" />
+    </div>
+    <div class="mt-3">
+        <label class="form-label">PaymentDate</label>
+        <input type="date" class="form-control" asp-for="PaymentDate" />
+    </div>
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-danger ms-3" asp-action="Delete" asp-controller="Reservations">Delete</button>
+    </div>
+</form>

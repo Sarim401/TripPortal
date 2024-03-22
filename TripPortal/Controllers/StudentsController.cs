@@ -26,7 +26,9 @@ namespace TripPortal.Controllers
                 Name = viewModel.Name,
                 Surname = viewModel.Surname,
                 Phone = viewModel.Phone,
-                Email = viewModel.Email
+                Email = viewModel.Email,
+                PESEL = viewModel.PESEL,
+                BirthDate = viewModel.BirthDate,
             };
 
             await dbContext.Students.AddAsync(student);
@@ -53,19 +55,21 @@ namespace TripPortal.Controllers
         {
             var student = await dbContext.Students.FindAsync(viewModel.StudentID);
 
-            if(student is not null)
+            if (student is not null)
             {
                 student.Name = viewModel.Name;
                 student.Surname = viewModel.Surname;
                 student.Phone = viewModel.Phone;
                 student.Email = viewModel.Email;
+                student.PESEL = viewModel.PESEL;
+                student.BirthDate = viewModel.BirthDate;
 
                 await dbContext.SaveChangesAsync();
             }
-            return RedirectToAction("List","Students");
+            return RedirectToAction("List", "Students");
         }
         [HttpPost]
-        public async Task<IActionResult> Delete (Student viewModel)
+        public async Task<IActionResult> Delete(Student viewModel)
         {
             var student = await dbContext.Students
                 .AsNoTracking()

@@ -11,9 +11,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Description</th>
+            <th>Country</th>
+            <th>City</th>
             <th>Price</th>
+            <th>StartDate</th>
+            <th>EndDate</th>
             <th></th>
         </tr>
     </thead>
@@ -21,9 +23,11 @@
         @foreach (var trip in Model)
         {
             <tr>
-                <td>@trip.Nazwa</td>
-                <td>@trip.Cena</td>
-                <td>@trip.Opis</td>
+                <td>@trip.Country</td>
+                <td>@trip.City</td>
+                <td>@trip.Price</td>
+                <td>@trip.StartDate</td>
+                <td>@trip.EndDate</td>
                 <td>
                     <a class="btn btn-primary" asp-controller="trips" asp-action="Edit" asp-route-id="@trip.TripID">Edit</a>
                 </td>

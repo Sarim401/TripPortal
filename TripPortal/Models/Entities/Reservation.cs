@@ -4,7 +4,11 @@
     {
         public Guid ReservationID { get; set; }
         public Guid TripID { get; set; }
-        public string PaymentStatus { get; set; }
-        public ICollection<Student> Student { get; set; }
+        public Trip Trip { get; set; }
+        public Guid StudentID { get; set; }
+        public Student Student { get; set; }
+        public DateTime ReservationDate { get; set; }
+        public DateTime PaymentDate { get; set; }
+        public decimal PriceForAll { get; set; }
     }
 }

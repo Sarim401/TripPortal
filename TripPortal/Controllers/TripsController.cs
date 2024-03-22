@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
 using TripPortal.Data;
 using TripPortal.Models;
 using TripPortal.Models.Entities;
@@ -19,13 +20,15 @@ namespace TripPortal.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult>Add(AddTripViewModel viewModel)
+        public async Task<IActionResult> Add(AddTripViewModel viewModel)
         {
             var Trip = new Trip
             {
-                Nazwa = viewModel.Nazwa,
-                Opis = viewModel.Opis,
-                Cena = viewModel.Cena
+                Country = viewModel.Country,
+                City = viewModel.City,
+                Price = viewModel.Price,
+                StartDate = viewModel.StartDate,
+                EndDate = viewModel.EndDate,
             };
             await dbContext.Trips.AddAsync(Trip);
             await dbContext.SaveChangesAsync();
@@ -53,9 +56,11 @@ namespace TripPortal.Controllers
 
             if (trip is not null)
             {
-                trip.Nazwa = viewModel.Nazwa;
-                trip.Opis = viewModel.Opis;
-                trip.Cena = viewModel.Cena;
+                trip.Country = viewModel.Country;
+                trip.City = viewModel.City;
+                trip.Price = viewModel.Price;
+                trip.StartDate = viewModel.StartDate;
+                trip.EndDate = viewModel.EndDate;
 
                 await dbContext.SaveChangesAsync();
             }

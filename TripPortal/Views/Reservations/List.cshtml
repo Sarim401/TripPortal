@@ -12,8 +12,10 @@
     <thead>
         <tr>
             <th>Reservation ID</th>
-            <th>Trip ID</th>
-            <th>Payment Status</th>
+            <th>TripID</th>
+            <th>StudentID</th>
+            <th>ReservationDate</th>
+            <th>PaymentDate</th>
             <th></th>
         </tr>
     </thead>
@@ -23,7 +25,9 @@
             <tr>
                 <td>@reservation.ReservationID</td>
                 <td>@reservation.TripID</td>
-                <td>@reservation.PaymentStatus</td>
+                <td>@reservation.StudentID</td>
+                <td>@reservation.ReservationDate</td>
+                <td>@reservation.PaymentDate</td>
                 <td>
                     <a class="btn btn-primary" asp-controller="Reservations" asp-action="Edit" asp-route-id="@reservation.ReservationID">Edit</a>
                 </td>

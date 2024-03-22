@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TripPortal.Data;
 
@@ -11,9 +12,11 @@ using TripPortal.Data;
 namespace TripPortal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240322175759_Added List")]
+    partial class AddedList
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,11 +80,16 @@ namespace TripPortal.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ReservationID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("StudentID");
+
+                    b.HasIndex("ReservationID");
 
                     b.ToTable("Students");
                 });
@@ -131,6 +139,18 @@ namespace TripPortal.Migrations
                     b.Navigation("Student");
 
                     b.Navigation("Trip");
+                });
+
+            modelBuilder.Entity("TripPortal.Models.Entities.Student", b =>
+                {
+                    b.HasOne("TripPortal.Models.Entities.Reservation", null)
+                        .WithMany("Students")
+                        .HasForeignKey("ReservationID");
+                });
+
+            modelBuilder.Entity("TripPortal.Models.Entities.Reservation", b =>
+                {
+                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }

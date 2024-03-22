@@ -2,8 +2,10 @@
 {
     public class AddTripViewModel
     {
-        public string Nazwa { get; set; }
-        public string Opis { get; set; }
-        public decimal Cena { get; set; }
+        public string Country { get; set; }
+        public string City { get; set; }
+        public decimal Price { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

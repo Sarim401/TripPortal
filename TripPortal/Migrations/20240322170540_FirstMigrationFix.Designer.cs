@@ -12,8 +12,8 @@ using TripPortal.Data;
 namespace TripPortal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240315105845_Initial Migration")]
-    partial class InitialMigration
+    [Migration("20240322170540_FirstMigrationFix")]
+    partial class FirstMigrationFix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,17 +31,23 @@ namespace TripPortal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid>("StudentID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("TripID")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ReservationID");
+
+                    b.HasIndex("StudentID");
+
+                    b.HasIndex("TripID");
 
                     b.ToTable("Reservations");
                 });
@@ -52,6 +58,9 @@ namespace TripPortal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -60,20 +69,19 @@ namespace TripPortal.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Phone")
+                    b.Property<string>("PESEL")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ReservationID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("StudentID");
-
-                    b.HasIndex("ReservationID");
 
                     b.ToTable("Students");
                 });
@@ -84,38 +92,45 @@ namespace TripPortal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Cena")
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("DataRozpoczecia")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataZakonczenia")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Nazwa")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Opis")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TripID");
 
                     b.ToTable("Trips");
                 });
 
-            modelBuilder.Entity("TripPortal.Models.Entities.Student", b =>
-                {
-                    b.HasOne("TripPortal.Models.Entities.Reservation", null)
-                        .WithMany("Students")
-                        .HasForeignKey("ReservationID");
-                });
-
             modelBuilder.Entity("TripPortal.Models.Entities.Reservation", b =>
                 {
-                    b.Navigation("Students");
+                    b.HasOne("TripPortal.Models.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TripPortal.Models.Entities.Trip", "Trip")
+                        .WithMany()
+                        .HasForeignKey("TripID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+
+                    b.Navigation("Trip");
                 });
 #pragma warning restore 612, 618
         }

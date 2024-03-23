@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TripPortal.Data;
+using TripPortal.Interfaces;
+using TripPortal.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,10 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("TripPortal")));
+
+builder.Services.AddScoped<ITripRepository, TripRepository>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
 var app = builder.Build();
 

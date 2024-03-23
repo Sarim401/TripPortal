@@ -4,23 +4,26 @@ using TripPortal.Models.Entities;
 using TripPortal.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Xml;
+using TripPortal.Interfaces;
 
 namespace TripPortal.Controllers
 {
     public class ReservationsController : Controller
     {
         private readonly ApplicationDbContext dbContext;
-        public ReservationsController(ApplicationDbContext dbContext)
+        private readonly IReservationRepository reservationRepo;
+        public ReservationsController(ApplicationDbContext dbContext, IReservationRepository reservationRepo)
         {
             this.dbContext = dbContext;
+            this.reservationRepo = reservationRepo;
         }
         [HttpGet]
         public async Task<IActionResult> Add(Guid TripID, Guid StudentID)
         {
             var viewmodel = new AddReservationViewModel
             {
-                Students = dbContext.Students.ToList(),
-                Trips = dbContext.Trips.ToList(),
+                Students = await reservationRepo.GetAllStudents(),
+                Trips = await reservationRepo.GetAllTrip()
             };
 
             return View(viewmodel);
@@ -56,8 +59,7 @@ namespace TripPortal.Controllers
                 PriceForAll = viewModel.PriceForAll
             };
 
-            dbContext.Reservations.Add(reservation);
-            dbContext.SaveChanges();
+            reservationRepo.AddAndSaveAsync(reservation);
 
             return RedirectToAction("List", "Reservations");
 
@@ -65,14 +67,14 @@ namespace TripPortal.Controllers
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var reservations = await dbContext.Reservations.ToListAsync();
+            var reservations = await reservationRepo.GetAllAsync();
 
             return View(reservations);
         }
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var Reservation = await dbContext.Reservations.FindAsync(id);
+            var Reservation = await reservationRepo.FindAsync(id);
 
 
 
@@ -81,7 +83,7 @@ namespace TripPortal.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(Reservation viewModel)
         {
-            var reservation = await dbContext.Reservations.FindAsync(viewModel.ReservationID);
+            var reservation = await reservationRepo.FindAsync(viewModel.ReservationID);
 
             if (reservation is not null)
             {
@@ -90,20 +92,18 @@ namespace TripPortal.Controllers
                 reservation.ReservationDate = viewModel.ReservationDate;
                 reservation.PaymentDate = viewModel.PaymentDate;
 
-                await dbContext.SaveChangesAsync();
+                await reservationRepo.Save();
             }
             return RedirectToAction("List", "Reservations");
         }
         [HttpPost]
         public async Task<IActionResult> Delete(Reservation viewModel)
         {
-            var reservation = await dbContext.Reservations
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.ReservationID == viewModel.ReservationID);
+            var reservation = await reservationRepo.FindFirst(viewModel);
             if (reservation is not null)
             {
-                dbContext.Reservations.Remove(viewModel);
-                await dbContext.SaveChangesAsync();
+                reservationRepo.Remove(viewModel);
+                await reservationRepo.Save();
             }
             return RedirectToAction("List", "Reservations");
         }

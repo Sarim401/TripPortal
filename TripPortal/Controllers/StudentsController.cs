@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TripPortal.Data;
+using TripPortal.Interfaces;
 using TripPortal.Models;
 using TripPortal.Models.Entities;
 
@@ -9,9 +10,11 @@ namespace TripPortal.Controllers
     public class StudentsController : Controller
     {
         private readonly ApplicationDbContext dbContext;
-        public StudentsController(ApplicationDbContext dbContext)
+        private readonly IStudentRepository studentRepo;
+        public StudentsController(ApplicationDbContext dbContext, IStudentRepository studentRepo)
         {
             this.dbContext = dbContext;
+            this.studentRepo = studentRepo;
         }
         [HttpGet]
         public IActionResult Add()
@@ -31,29 +34,29 @@ namespace TripPortal.Controllers
                 BirthDate = viewModel.BirthDate,
             };
 
-            await dbContext.Students.AddAsync(student);
-            await dbContext.SaveChangesAsync();
+            await studentRepo.AddAsync(student);
+            await studentRepo.Save();
 
             return View();
         }
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var students = await dbContext.Students.ToListAsync();
+            var students = await studentRepo.GetAllAsync();
 
             return View(students);
         }
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var student = await dbContext.Students.FindAsync(id);
+            var student = await studentRepo.FindAsync(id);
 
             return View(student);
         }
         [HttpPost]
         public async Task<IActionResult> Edit(Student viewModel)
         {
-            var student = await dbContext.Students.FindAsync(viewModel.StudentID);
+            var student = await studentRepo.FindAsync(viewModel.StudentID);
 
             if (student is not null)
             {
@@ -64,20 +67,18 @@ namespace TripPortal.Controllers
                 student.PESEL = viewModel.PESEL;
                 student.BirthDate = viewModel.BirthDate;
 
-                await dbContext.SaveChangesAsync();
+                await studentRepo.Save();
             }
             return RedirectToAction("List", "Students");
         }
         [HttpPost]
         public async Task<IActionResult> Delete(Student viewModel)
         {
-            var student = await dbContext.Students
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.StudentID == viewModel.StudentID);
+            var student = await studentRepo.FindFirst(viewModel);
             if (student is not null)
             {
                 dbContext.Students.Remove(viewModel);
-                await dbContext.SaveChangesAsync();
+                await studentRepo.Save();
             }
             return RedirectToAction("List", "Students");
         }

@@ -31,23 +31,6 @@ namespace TripPortal.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddReservationViewModel viewModel)
         {
-            if (viewModel.SelectedStudentID == Guid.Empty)
-            {
-                ModelState.AddModelError(string.Empty, "Please select a student.");
-                return View(viewModel);
-            }
-
-            if (viewModel.TripID == Guid.Empty)
-            {
-                ModelState.AddModelError(string.Empty, "Please select a trip.");
-                return View(viewModel);
-            }
-
-            if (viewModel.ReservationDate > viewModel.PaymentDate)
-            {
-                ModelState.AddModelError(string.Empty, "Reservation date cannot be later than payment date.");
-                return View(viewModel);
-            }
 
             var reservation = new Reservation
             {

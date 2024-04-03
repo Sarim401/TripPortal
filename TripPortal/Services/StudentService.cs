@@ -44,6 +44,7 @@ namespace TripPortal.Services
             var students = await _studentRepository.GetAllAsync();
             return students.OrderBy(s => s.BirthDate).ToList();
         }
+<<<<<<< HEAD
         public Task<int> SaveChangesAsync()
         {
             return _studentRepository.Save();
@@ -53,5 +54,7 @@ namespace TripPortal.Services
         {
             return _studentRepository.AddAsync(student);
         }
+=======
+>>>>>>> 26ea54b012ded3bc5ed5bd72ed91d91d556e3db6
     }
 }

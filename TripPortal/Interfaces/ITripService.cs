@@ -11,5 +11,9 @@ namespace TripPortal.Interfaces
         Task<List<Trip>> GetSortedTripsByPriceAsync();
         Task<List<Trip>> GetSortedTripsByStartDateAsync();
         Task<List<Trip>> GetFirstFiveTripsSortedByIdAsync();
+        Task<Trip> DeleteTripAsync(Trip viewModel);
+        Task<int> SaveChangesAsync();
+        Task AddTripAsync(Trip trip);
+        Task<Trip> FindTripAsync(Guid id);
     }
 }

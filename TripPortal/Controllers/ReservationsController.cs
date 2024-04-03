@@ -10,13 +10,10 @@ namespace TripPortal.Controllers
 {
     public class ReservationsController : Controller
     {
-        private readonly ApplicationDbContext dbContext;
-        private readonly IReservationRepository reservationRepo;
+
         private readonly IReservationService reservationService;
-        public ReservationsController(ApplicationDbContext dbContext, IReservationRepository reservationRepo, IReservationService reservationService)
+        public ReservationsController(IReservationService reservationService)
         {
-            this.dbContext = dbContext;
-            this.reservationRepo = reservationRepo;
             this.reservationService = reservationService;
         }
         [HttpGet]

@@ -71,7 +71,7 @@ namespace TripPortal.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Trip viewModel)
         {
-            var trip = await tripRepo.Delete(viewModel);
+            var trip = await tripService.DeleteTripAsync(viewModel);
             if (trip is not null)
             {
                 await tripService.DeleteTripAsync(viewModel);

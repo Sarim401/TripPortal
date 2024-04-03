@@ -45,7 +45,7 @@ namespace TripPortal.Services
             var reservations = await _reservationRepository.GetAllAsync();
             return reservations.OrderBy(r => r.ReservationDate).ToList();
         }
-<<<<<<< HEAD
+
         public Task<int> SaveChangesAsync()
         {
             return _reservationRepository.Save();
@@ -69,7 +69,7 @@ namespace TripPortal.Services
         public Task<List<Trip>> GetAllTripsAsync()
         {
             return _reservationRepository.GetAllTrip();
-=======
+        }
 
         public async Task AddReservationAsync(Reservation reservation)
         {
@@ -84,7 +84,11 @@ namespace TripPortal.Services
                 await _reservationRepository.Remove(reservation);
                 await _reservationRepository.Save();
             }
->>>>>>> 26ea54b012ded3bc5ed5bd72ed91d91d556e3db6
+        }
+
+        public async Task<Reservation> FindFirstReservationAsync(Reservation viewModel)
+        {
+            return await _reservationRepository.FindFirst(viewModel);
         }
     }
 }

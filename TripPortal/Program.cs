@@ -15,8 +15,9 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("TripPortal")));
 builder.Services.AddScoped<ITripRepository, TripRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+
 builder.Services.AddTransient<IStudentService, StudentService>();
-builder.Services.AddTransient<ITripRepository, TripRepository>();
+builder.Services.AddTransient<ITripService, TripService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
 
 var app = builder.Build();

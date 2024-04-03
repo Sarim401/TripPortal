@@ -1,4 +1,5 @@
-﻿using TripPortal.Models.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using TripPortal.Models.Entities;
 
 namespace TripPortal.Interfaces
 {
@@ -12,5 +13,6 @@ namespace TripPortal.Interfaces
         Task Remove(Reservation viewModel);
         Task<List<Student>> GetAllStudents();
         Task<List<Trip>> GetAllTrip();
+    
     }
 }

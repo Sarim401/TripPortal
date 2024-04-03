@@ -18,7 +18,7 @@ namespace TripPortal.Controllers
             this.reservationRepo = reservationRepo;
         }
         [HttpGet]
-        public async Task<IActionResult> Add(Guid TripID, Guid StudentID)
+        public async Task<IActionResult> Add()
         {
             var viewmodel = new AddReservationViewModel
             {

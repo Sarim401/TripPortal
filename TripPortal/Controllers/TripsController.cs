@@ -10,12 +10,10 @@ namespace TripPortal.Controllers
 {
     public class TripsController : Controller
     {
-        private readonly ApplicationDbContext dbContext;
-        private readonly ITripRepository tripRepo;
-        public TripsController(ApplicationDbContext dbContext, ITripRepository tripRepo)
+        private readonly ITripService tripService;
+        public TripsController(ITripService tripService)
         {
-            this.dbContext = dbContext;
-            this.tripRepo = tripRepo;
+            this.tripService = tripService;
         }
         [HttpGet]
         public IActionResult Add()
@@ -33,29 +31,30 @@ namespace TripPortal.Controllers
                 StartDate = viewModel.StartDate,
                 EndDate = viewModel.EndDate,
             };
-            await tripRepo.AddAsync(Trip);
-            await tripRepo.Save();
+            await tripService.AddTripAsync(Trip);
+            await tripService.SaveChangesAsync();
+
 
             return View();
         }
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var trips = await tripRepo.GetAllAsync();
+            var trips = await tripService.GetAllTripsAsync();
 
             return View(trips);
         }
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var trip = await tripRepo.FindAsync(id);
+            var trip = await tripService.FindTripAsync(id);
 
             return View(trip);
         }
         [HttpPost]
         public async Task<IActionResult> Edit(Trip viewModel)
         {
-            var trip = await tripRepo.FindAsync(viewModel.TripID);
+            var trip = await tripService.FindTripAsync(viewModel.TripID);
 
             if (trip is not null)
             {
@@ -65,7 +64,7 @@ namespace TripPortal.Controllers
                 trip.StartDate = viewModel.StartDate;
                 trip.EndDate = viewModel.EndDate;
 
-                await tripRepo.Save();
+                await tripService.SaveChangesAsync();
             }
             return RedirectToAction("List", "Trips");
         }
@@ -75,8 +74,8 @@ namespace TripPortal.Controllers
             var trip = await tripRepo.Delete(viewModel);
             if (trip is not null)
             {
-                dbContext.Trips.Remove(viewModel);
-                await tripRepo.Save();
+                await tripService.DeleteTripAsync(viewModel);
+                await tripService.SaveChangesAsync();
             }
             return RedirectToAction("List", "Trips");
         }

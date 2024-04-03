@@ -12,18 +12,20 @@ namespace TripPortal.Controllers
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IReservationRepository reservationRepo;
-        public ReservationsController(ApplicationDbContext dbContext, IReservationRepository reservationRepo)
+        private readonly IReservationService reservationService;
+        public ReservationsController(ApplicationDbContext dbContext, IReservationRepository reservationRepo, IReservationService reservationService)
         {
             this.dbContext = dbContext;
             this.reservationRepo = reservationRepo;
+            this.reservationService = reservationService;
         }
         [HttpGet]
         public async Task<IActionResult> Add()
         {
             var viewmodel = new AddReservationViewModel
             {
-                Students = await reservationRepo.GetAllStudents(),
-                Trips = await reservationRepo.GetAllTrip()
+                Students = await reservationService.GetAllStudentsAsync(),
+                Trips = await reservationService.GetAllTripsAsync()
             };
 
             return View(viewmodel);
@@ -31,23 +33,6 @@ namespace TripPortal.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddReservationViewModel viewModel)
         {
-            if (viewModel.SelectedStudentID == Guid.Empty)
-            {
-                ModelState.AddModelError(string.Empty, "Please select a student.");
-                return View(viewModel);
-            }
-
-            if (viewModel.TripID == Guid.Empty)
-            {
-                ModelState.AddModelError(string.Empty, "Please select a trip.");
-                return View(viewModel);
-            }
-
-            if (viewModel.ReservationDate > viewModel.PaymentDate)
-            {
-                ModelState.AddModelError(string.Empty, "Reservation date cannot be later than payment date.");
-                return View(viewModel);
-            }
 
             var reservation = new Reservation
             {
@@ -59,7 +44,7 @@ namespace TripPortal.Controllers
                 PriceForAll = viewModel.PriceForAll
             };
 
-            reservationRepo.AddAndSaveAsync(reservation);
+            await reservationService.AddAndSaveReservationAsync(reservation);
 
             return RedirectToAction("List", "Reservations");
 
@@ -67,23 +52,21 @@ namespace TripPortal.Controllers
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var reservations = await reservationRepo.GetAllAsync();
+            var reservations = await reservationService.GetAllReservationsAsync();
 
             return View(reservations);
         }
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var Reservation = await reservationRepo.FindAsync(id);
-
-
+            var Reservation = await reservationService.GetReservationByIdAsync(id);
 
             return View(Reservation);
         }
         [HttpPost]
         public async Task<IActionResult> Edit(Reservation viewModel)
         {
-            var reservation = await reservationRepo.FindAsync(viewModel.ReservationID);
+            var reservation = await reservationService.GetReservationByIdAsync(viewModel.ReservationID);
 
             if (reservation is not null)
             {
@@ -92,18 +75,18 @@ namespace TripPortal.Controllers
                 reservation.ReservationDate = viewModel.ReservationDate;
                 reservation.PaymentDate = viewModel.PaymentDate;
 
-                await reservationRepo.Save();
+                await reservationService.SaveChangesAsync();
             }
             return RedirectToAction("List", "Reservations");
         }
         [HttpPost]
         public async Task<IActionResult> Delete(Reservation viewModel)
         {
-            var reservation = await reservationRepo.FindFirst(viewModel);
+            var reservation = await reservationService.FindFirstReservationAsync(viewModel);
             if (reservation is not null)
             {
-                reservationRepo.Remove(viewModel);
-                await reservationRepo.Save();
+                await reservationService.RemoveReservationAsync(viewModel);
+                await reservationService.SaveChangesAsync();
             }
             return RedirectToAction("List", "Reservations");
         }

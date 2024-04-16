@@ -1,4 +1,4 @@
-namespace TripPortal.Models
+namespace TripPortal.Models.ViewModel
 {
     public class ErrorViewModel
     {

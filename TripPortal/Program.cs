@@ -1,8 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using TripPortal.AutoMapper;
 using TripPortal.Data;
 using TripPortal.Interfaces;
 using TripPortal.Repository;
 using TripPortal.Services;
+using FluentValidation.AspNetCore;
+using TripPortal.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,14 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddTransient<IStudentService, StudentService>();
 builder.Services.AddTransient<ITripService, TripService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
+builder.Services.AddAutoMapper(options =>
+{
+    options.AddProfile<AutoMapperProfiles>();
+});
+builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<StudentValidator>());
+
+
+
 
 var app = builder.Build();
 

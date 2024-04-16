@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TripPortal.Data;
 using TripPortal.Models.Entities;
-using TripPortal.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Xml;
 using TripPortal.Interfaces;
+using TripPortal.Models.ViewModel;
+using AutoMapper;
+using TripPortal.Validators;
+using FluentValidation;
 
 namespace TripPortal.Controllers
 {
@@ -12,9 +15,11 @@ namespace TripPortal.Controllers
     {
 
         private readonly IReservationService reservationService;
-        public ReservationsController(IReservationService reservationService)
+        private readonly IMapper mapper;
+        public ReservationsController(IReservationService reservationService, IMapper mapper)
         {
             this.reservationService = reservationService;
+            this.mapper = mapper;
         }
         [HttpGet]
         public async Task<IActionResult> Add()
@@ -30,17 +35,18 @@ namespace TripPortal.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddReservationViewModel viewModel)
         {
-
-            var reservation = new Reservation
+            var validator = new AddReservationViewModelValidator();
+            var validationResult = validator.Validate(viewModel);
+            if (!validationResult.IsValid)
             {
-                ReservationID = Guid.NewGuid(),
-                TripID = viewModel.TripID,
-                StudentID = viewModel.SelectedStudentID,
-                ReservationDate = viewModel.ReservationDate,
-                PaymentDate = viewModel.PaymentDate,
-                PriceForAll = viewModel.PriceForAll
-            };
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                return View(viewModel);
+            }
 
+            var reservation = mapper.Map<Reservation>(viewModel);
             await reservationService.AddAndSaveReservationAsync(reservation);
 
             return RedirectToAction("List", "Reservations");
@@ -67,11 +73,17 @@ namespace TripPortal.Controllers
 
             if (reservation is not null)
             {
-                reservation.TripID = viewModel.TripID;
-                reservation.StudentID = viewModel.StudentID;
-                reservation.ReservationDate = viewModel.ReservationDate;
-                reservation.PaymentDate = viewModel.PaymentDate;
-
+                var validator = new ReservationValidator();
+                var validationResult = validator.Validate(viewModel);
+                if (!validationResult.IsValid)
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                    }
+                    return View(viewModel);
+                }
+                mapper.Map(viewModel, reservation);
                 await reservationService.SaveChangesAsync();
             }
             return RedirectToAction("List", "Reservations");

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using TripPortal.Models;
+using TripPortal.Models.ViewModel;
 
 namespace TripPortal.Controllers
 {

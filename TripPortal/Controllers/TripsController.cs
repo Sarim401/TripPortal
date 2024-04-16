@@ -1,19 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
 using TripPortal.Data;
 using TripPortal.Interfaces;
 using TripPortal.Models;
 using TripPortal.Models.Entities;
+using TripPortal.Validators;
 
 namespace TripPortal.Controllers
 {
     public class TripsController : Controller
     {
         private readonly ITripService tripService;
-        public TripsController(ITripService tripService)
+        private readonly IMapper mapper;
+        public TripsController(ITripService tripService, IMapper mapper)
         {
             this.tripService = tripService;
+            this.mapper = mapper;
         }
         [HttpGet]
         public IActionResult Add()
@@ -23,15 +28,18 @@ namespace TripPortal.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddTripViewModel viewModel)
         {
-            var Trip = new Trip
+            var validator = new AddTripViewModelValidator();
+            var validationResult = validator.Validate(viewModel);
+            if (!validationResult.IsValid)
             {
-                Country = viewModel.Country,
-                City = viewModel.City,
-                Price = viewModel.Price,
-                StartDate = viewModel.StartDate,
-                EndDate = viewModel.EndDate,
-            };
-            await tripService.AddTripAsync(Trip);
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                return View(viewModel);
+            }
+            var trip = mapper.Map<Trip>(viewModel);
+            await tripService.AddTripAsync(trip);
             await tripService.SaveChangesAsync();
 
 
@@ -58,12 +66,18 @@ namespace TripPortal.Controllers
 
             if (trip is not null)
             {
-                trip.Country = viewModel.Country;
-                trip.City = viewModel.City;
-                trip.Price = viewModel.Price;
-                trip.StartDate = viewModel.StartDate;
-                trip.EndDate = viewModel.EndDate;
+                var validator = new TripValidator();
+                var validationResult = validator.Validate(viewModel);
 
+                if (!validationResult.IsValid)
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                    }
+                    return View(viewModel);
+                }
+                mapper.Map(viewModel, trip);
                 await tripService.SaveChangesAsync();
             }
             return RedirectToAction("List", "Trips");

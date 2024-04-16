@@ -1,19 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TripPortal.Data;
 using TripPortal.Interfaces;
-using TripPortal.Models;
 using TripPortal.Models.Entities;
+using TripPortal.Models.ViewModel;
+using TripPortal.Validators;
 
 namespace TripPortal.Controllers
 {
     public class StudentsController : Controller
     {
         private readonly IStudentService studentService;
-        public StudentsController(IStudentService studentService)
+        private readonly IMapper mapper;
+        public StudentsController(IStudentService studentService, IMapper mapper)
         {
             this.studentService = studentService;
-
+            this.mapper = mapper;
         }
         [HttpGet]
         public IActionResult Add()
@@ -23,15 +26,18 @@ namespace TripPortal.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddStudentViewModel viewModel)
         {
-            var student = new Student
+            var validator = new AddStudentViewModelValidator();
+            var validationResult = validator.Validate(viewModel);
+            if (!validationResult.IsValid)
             {
-                Name = viewModel.Name,
-                Surname = viewModel.Surname,
-                Phone = viewModel.Phone,
-                Email = viewModel.Email,
-                PESEL = viewModel.PESEL,
-                BirthDate = viewModel.BirthDate,
-            };
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                return View(viewModel);
+            }
+
+            var student = mapper.Map<Student>(viewModel);
             await studentService.AddStudentAsync(student);
             await studentService.SaveChangesAsync();
 
@@ -57,15 +63,21 @@ namespace TripPortal.Controllers
         {
             var student = await studentService.GetStudentByIdAsync(viewModel.StudentID);
 
+
             if (student is not null)
             {
-                student.Name = viewModel.Name;
-                student.Surname = viewModel.Surname;
-                student.Phone = viewModel.Phone;
-                student.Email = viewModel.Email;
-                student.PESEL = viewModel.PESEL;
-                student.BirthDate = viewModel.BirthDate;
+                var validator = new StudentValidator();
+                var validationResult = validator.Validate(viewModel);
 
+                if (!validationResult.IsValid)
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                    }
+                    return View(viewModel);
+                }
+                mapper.Map(viewModel, student);
                 await studentService.SaveChangesAsync();
             }
             return RedirectToAction("List", "Students");

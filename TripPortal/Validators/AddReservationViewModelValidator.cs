@@ -11,9 +11,6 @@ namespace TripPortal.Validators
             RuleFor(r => r.TripID)
               .NotEmpty().WithMessage("Trip is required.");
 
-            RuleFor(r => r.StudentID)
-              .NotEmpty().WithMessage("Student is required.");
-
             RuleFor(r => r.ReservationDate)
               .LessThanOrEqualTo(DateTime.Now).WithMessage("Reservation date cannot be in the future.");
 

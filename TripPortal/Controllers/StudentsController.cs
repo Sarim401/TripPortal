@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TripPortal.Data;
@@ -9,6 +10,7 @@ using TripPortal.Validators;
 
 namespace TripPortal.Controllers
 {
+    [Authorize(Roles = "admin")]
     public class StudentsController : Controller
     {
         private readonly IStudentService studentService;

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
@@ -11,6 +12,7 @@ using TripPortal.Validators;
 
 namespace TripPortal.Controllers
 {
+    [Authorize(Roles = "admin, employee")]
     public class TripsController : Controller
     {
         private readonly ITripService tripService;
@@ -46,6 +48,7 @@ namespace TripPortal.Controllers
             return View();
         }
         [HttpGet]
+        [Authorize(Roles = "admin, employee")]
         public async Task<IActionResult> List()
         {
             var trips = await tripService.GetAllTripsAsync();
@@ -53,6 +56,7 @@ namespace TripPortal.Controllers
             return View(trips);
         }
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(Guid id)
         {
             var trip = await tripService.FindTripAsync(id);
@@ -60,6 +64,7 @@ namespace TripPortal.Controllers
             return View(trip);
         }
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(Trip viewModel)
         {
             var trip = await tripService.FindTripAsync(viewModel.TripID);
@@ -83,6 +88,7 @@ namespace TripPortal.Controllers
             return RedirectToAction("List", "Trips");
         }
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(Trip viewModel)
         {
             var trip = await tripService.DeleteTripAsync(viewModel);

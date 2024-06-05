@@ -8,9 +8,11 @@ using TripPortal.Models.ViewModel;
 using AutoMapper;
 using TripPortal.Validators;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TripPortal.Controllers
 {
+    [Authorize(Roles = "admin, student")]
     public class ReservationsController : Controller
     {
 
@@ -53,6 +55,7 @@ namespace TripPortal.Controllers
 
         }
         [HttpGet]
+        [Authorize(Roles = "admin, employee")]
         public async Task<IActionResult> List()
         {
             var reservations = await reservationService.GetAllReservationsAsync();
@@ -60,6 +63,7 @@ namespace TripPortal.Controllers
             return View(reservations);
         }
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(Guid id)
         {
             var Reservation = await reservationService.GetReservationByIdAsync(id);
@@ -67,6 +71,7 @@ namespace TripPortal.Controllers
             return View(Reservation);
         }
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(Reservation viewModel)
         {
             var reservation = await reservationService.GetReservationByIdAsync(viewModel.ReservationID);
@@ -89,6 +94,7 @@ namespace TripPortal.Controllers
             return RedirectToAction("List", "Reservations");
         }
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(Reservation viewModel)
         {
             var reservation = await reservationService.FindFirstReservationAsync(viewModel);
